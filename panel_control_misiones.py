@@ -69,7 +69,7 @@ async def _mover_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D):
         motor_D.run_angle(velocidad_D, angulo_D)
     )
 
-# Correr este, el anterior es una definición
+# Correr este, el anterior es solo una definición
 def mover_motores_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D):
     run_task(_mover_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D))
 
@@ -77,6 +77,11 @@ def mover_motores_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D):
 #   DEFINICIÓN DE MISIONES
 
 def mision_1():
+    avanzar(380, 1000, 900)
+    girar(-90)
+    girar_alrededor(400, -10, 80)    
+
+def mision_2():
     avanzar(500, 1000, 800)
     girar_alrededor(600, 300, 90)
     avanzar(870, 1000, 600)
@@ -87,9 +92,6 @@ def mision_1():
     retroceder(870, 1000, 600)
     girar_alrededor(-600, -300, -90)
     retroceder(500, 1000, 800)
-
-def mision_2():
-    girar(90)
 
 def mision_3():
     mover_motores_juntos(500, 360, -500, 360)
@@ -131,7 +133,6 @@ def elegir_mision_inicial():
             return indice  # confirmado: esta es la misión de arranque
 
         wait(10)  # pausa corta del loop para no saturar el procesador
-
 
 
 #   EJECUCIÓN — arranca desde la misión elegida
