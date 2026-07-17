@@ -77,11 +77,6 @@ def mover_motores_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D):
 #   DEFINICIÓN DE MISIONES
 
 def mision_1():
-    avanzar(380, 1000, 900)
-    girar(-90)
-    girar_alrededor(400, -10, 80)    
-
-def mision_2():
     mover_motores_juntos(1000, 200, 1000, -200)
     avanzar(350, 850, 600)
     girar(25, 300)
@@ -92,7 +87,10 @@ def mision_2():
     girar(-28)
     avanzar(20, 150, 100)
     girar_alrededor(0, -150, 18)
-    retroceder(500, 1000, 900)
+    retroceder(500, 1000, 900)  
+
+def mision_2():
+    girar(90)
 
 def mision_3():
     mover_motores_juntos(500, 360, -500, 360)
