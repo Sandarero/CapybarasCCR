@@ -63,28 +63,26 @@ def mover_motor_C(velocidad, angulo):
 def mover_motor_D(velocidad, angulo):
     motor_D.run_angle(velocidad, angulo)
 
-async def _mover_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D):
-    await multitask(
-        motor_C.run_angle(velocidad_C, angulo_C),
-        motor_D.run_angle(velocidad_D, angulo_D)
-    )
+async def _correr_juntos(*tareas):
+    # *tareas significa: "lo que sea que me hayan pasado, tratalo como una lista"
+    await multitask(*tareas)
 
-# Correr este, el anterior es solo una definición
-def mover_motores_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D):
-    run_task(_mover_juntos(velocidad_C, angulo_C, velocidad_D, angulo_D))
+def correr_juntos(*tareas):
+    # Corre cualquier cantidad de movimientos AL MISMO TIEMPO.
+    run_task(_correr_juntos(*tareas))
 
 
 #   DEFINICIÓN DE MISIONES
 
 def mision_1():
-    mover_motores_juntos(1000, 200, 1000, -200)
-    avanzar(350, 850, 600)
+    correr_juntos(avanzar(350, 850, 600), mover_motor_C(1000, 200), mover_motor_D(1000, -200))
     girar(25, 300)
     retroceder(150, 850, 600)
     girar(45)
-    avanzar(300, 850, 600)
-    mover_motores_juntos(1000, -200, 1000, 200)
+    correr_juntos(avanzar(300, 850, 600), mover_motor_C(1000, -200), mover_motor_D(1000, 200))
     girar(-28)
+    avanzar(145, 850, 600)
+    correr_juntos(mover_motor_C(100, 150), mover_motor_D(100, -150))
     avanzar(20, 150, 100)
     girar_alrededor(0, -150, 18)
     retroceder(500, 1000, 900)  
@@ -93,7 +91,7 @@ def mision_2():
     girar(90)
 
 def mision_3():
-    mover_motores_juntos(500, 360, -500, 360)
+    correr_juntos(mover_motor_C(500, 360), mover_motor_D(500, 360))
 
 def mision_4():
     girar_alrededor(0, 300, -90)
@@ -115,30 +113,32 @@ NUM_MISIONES = len(mision_funciones)
 
 #   SELECTOR DE MISIÓN INICIAL — botones del Hub
 
-def elegir_mision_inicial():
+def elegir_y_correr_misiones():
     indice = 0
-    hub.display.number(indice + 1)  # mostrar "misión 1" (índice 0 = misión 1)
+    hub.display.number(indice + 1)
 
     while True:
-        pressed = hub.buttons.pressed()  # qué botones están apretados AHORA
+        pressed = hub.buttons.pressed()
 
         if Button.RIGHT in pressed:
             indice = (indice + 1) % NUM_MISIONES
             hub.display.number(indice + 1)
-            wait(250)
+
+            while Button.RIGHT in hub.buttons.pressed():
+                wait(10)
 
         elif Button.LEFT in pressed:
-            wait(250)
-            return indice  # confirmado: esta es la misión de arranque
+            if EJECUTAR[indice]:
+                mision_funciones[indice]()
+            else:
+                # Misión desactivada: avisar con una X antes de volver al número
+                hub.display.char("X")
+                wait(500)
+                hub.display.number(indice + 1)   # volver a mostrar la selección actual
 
-        wait(10)  # pausa corta del loop para no saturar el procesador
+            while Button.LEFT in hub.buttons.pressed():
+                wait(10)
 
+        wait(10)
 
-#   EJECUCIÓN — arranca desde la misión elegida
-
-mision_inicial = elegir_mision_inicial()
-
-for i in range(mision_inicial, NUM_MISIONES):
-    if EJECUTAR[i]:
-        mision_funciones[i]()
-        wait(500)
+elegir_y_correr_misiones()
