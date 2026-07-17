@@ -18,7 +18,7 @@ motor_C = Motor(Port.C)
 motor_D = Motor(Port.D)
 
 wheel_diameter = 62
-axle_track = 150  # AJUSTAR: medí la distancia real entre tus ruedas
+axle_track = 150
 
 robot = DriveBase(left_motor, right_motor, wheel_diameter, axle_track)
 robot.use_gyro(True)
@@ -82,16 +82,17 @@ def mision_1():
     girar_alrededor(400, -10, 80)    
 
 def mision_2():
-    avanzar(500, 1000, 800)
-    girar_alrededor(600, 300, 90)
-    avanzar(870, 1000, 600)
-    girar_alrededor(600, 300, 90)
-    avanzar(500, 1000, 800)
-    retroceder(500, 1000, 800)
-    girar_alrededor(-600, -300, -90)
-    retroceder(870, 1000, 600)
-    girar_alrededor(-600, -300, -90)
-    retroceder(500, 1000, 800)
+    mover_motores_juntos(1000, 200, 1000, -200)
+    avanzar(350, 850, 600)
+    girar(25, 300)
+    retroceder(150, 850, 600)
+    girar(45)
+    avanzar(300, 850, 600)
+    mover_motores_juntos(1000, -200, 1000, 200)
+    girar(-28)
+    avanzar(20, 150, 100)
+    girar_alrededor(0, -150, 18)
+    retroceder(500, 1000, 900)
 
 def mision_3():
     mover_motores_juntos(500, 360, -500, 360)
