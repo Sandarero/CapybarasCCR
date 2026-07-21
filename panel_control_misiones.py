@@ -69,12 +69,12 @@ async def async_avanzar(distancia_mm, velocidad, aceleracion):
     # En Pybricks, el método straight NO es asíncrono puro de por sí, 
     # pero podemos usar el truco de lanzar el motor en paralelo si lo necesitas,
     # o mejor aún, usar await con métodos que soportan async de Pybricks:
-    await robot.straight(distancia_mm, wait=False) 
+    await robot.straight(distancia_mm) 
     while not robot.done():
         await wait(10)
 
 async def async_retroceder(distancia_mm, velocidad, aceleracion):
-    async_avanzar(-distancia_mm, velocidad, aceleracion)
+    await async_avanzar(-distancia_mm, velocidad, aceleracion)
 
 async def async_mover_motor_C(velocidad, angulo):
     # Al pasar wait=False, Pybricks no bloquea y nos permite usar await
