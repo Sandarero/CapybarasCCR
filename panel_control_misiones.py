@@ -63,26 +63,34 @@ def mover_motor_C(velocidad, angulo):
 def mover_motor_D(velocidad, angulo):
     motor_D.run_angle(velocidad, angulo)
 
-async def _correr_juntos(*tareas):
-    # *tareas significa: "lo que sea que me hayan pasado, tratalo como una lista"
-    await multitask(*tareas)
+async def _correr_juntos(*generadores):
+    # generadores son funciones SIN llamar todavía (lambdas)
+    # Acá adentro, en el momento justo, las llamamos - AHORA sí funciona
+    await multitask(*(gen() for gen in generadores))
 
-def correr_juntos(*tareas):
-    # Corre cualquier cantidad de movimientos AL MISMO TIEMPO.
-    run_task(_correr_juntos(*tareas))
+def correr_juntos(*generadores):
+    run_task(_correr_juntos(*generadores))
 
 
 #   DEFINICIÓN DE MISIONES
 
 def mision_1():
-    correr_juntos(avanzar(350, 850, 600), mover_motor_C(1000, 200), mover_motor_D(1000, -200))
+    correr_juntos(
+        lambda: avanzar(350, 850, 600),
+        lambda: mover_motor_C(1000, 200),
+        lambda: mover_motor_D(1000, -200))
     girar(25, 300)
     retroceder(150, 850, 600)
     girar(45)
-    correr_juntos(avanzar(300, 850, 600), mover_motor_C(1000, -200), mover_motor_D(1000, 200))
+    correr_juntos(
+        lambda: avanzar(300, 850, 600),
+        lambda: mover_motor_C(1000, -200),
+        lambda: mover_motor_D(1000, 200))
     girar(-28)
     avanzar(145, 850, 600)
-    correr_juntos(mover_motor_C(100, 150), mover_motor_D(100, -150))
+    correr_juntos(
+        lambda: mover_motor_C(100, 150),
+        lambda: mover_motor_D(100, -150))
     avanzar(20, 150, 100)
     girar_alrededor(0, -150, 18)
     retroceder(500, 1000, 900)  
@@ -91,7 +99,9 @@ def mision_2():
     girar(90)
 
 def mision_3():
-    correr_juntos(mover_motor_C(500, 360), mover_motor_D(500, 360))
+    correr_juntos(
+        lambda: mover_motor_C(500, 360),
+        lambda: mover_motor_D(500, 360))
 
 def mision_4():
     girar_alrededor(0, 300, -90)
