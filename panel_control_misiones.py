@@ -54,7 +54,6 @@ def girar_alrededor(velocidad_izq, velocidad_der, angulo_objetivo, margen_error=
     right_motor.stop()
     robot.use_gyro(True)                # devolverle el gyro al DriveBase
 
-
 #   FUNCIONES DE MOTORES DE MISIÓN (C y D)
 
 def mover_motor_C(velocidad, angulo):
@@ -63,34 +62,58 @@ def mover_motor_C(velocidad, angulo):
 def mover_motor_D(velocidad, angulo):
     motor_D.run_angle(velocidad, angulo)
 
-async def _correr_juntos(*generadores):
-    # generadores son funciones SIN llamar todavía (lambdas)
-    # Acá adentro, en el momento justo, las llamamos - AHORA sí funciona
-    await multitask(*(gen() for gen in generadores))
+#   VERSIONES ASÍNCRONAS PARA MULTITAREA (agrega "async_" al inicio)
 
-def correr_juntos(*generadores):
-    run_task(_correr_juntos(*generadores))
+async def async_avanzar(distancia_mm, velocidad, aceleracion):
+    robot.settings(straight_speed=velocidad, straight_acceleration=aceleracion)
+    # En Pybricks, el método straight NO es asíncrono puro de por sí, 
+    # pero podemos usar el truco de lanzar el motor en paralelo si lo necesitas,
+    # o mejor aún, usar await con métodos que soportan async de Pybricks:
+    await robot.straight(distancia_mm, wait=False) 
+    while not robot.done():
+        await wait(10)
+
+async def async_retroceder(distancia_mm, velocidad, aceleracion):
+    async_avanzar(-distancia_mm, velocidad, aceleracion)
+
+async def async_mover_motor_C(velocidad, angulo):
+    # Al pasar wait=False, Pybricks no bloquea y nos permite usar await
+    await motor_C.run_angle(velocidad, angulo, wait=False)
+    while not motor_C.done():
+        await wait(10)
+
+async def async_mover_motor_D(velocidad, angulo):
+    await motor_D.run_angle(velocidad, angulo, wait=False)
+    while not motor_D.done():
+        await wait(10)
+
+async def _correr_juntos(*corrutinas):
+    # Desempaquetamos directamente las corrutinas dentro de multitask
+    await multitask(*corrutinas)
+
+def correr_juntos(*corrutinas):
+    run_task(_correr_juntos(*corrutinas))
 
 
 #   DEFINICIÓN DE MISIONES
 
 def mision_1():
     correr_juntos(
-        lambda: avanzar(350, 850, 600),
-        lambda: mover_motor_C(1000, 200),
-        lambda: mover_motor_D(1000, -200))
+        async_avanzar(350, 850, 600),
+        async_mover_motor_C(1000, 200),
+        async_mover_motor_D(1000, -200))
     girar(25, 300)
     retroceder(150, 850, 600)
     girar(45)
     correr_juntos(
-        lambda: avanzar(300, 850, 600),
-        lambda: mover_motor_C(1000, -200),
-        lambda: mover_motor_D(1000, 200))
+        async_avanzar(300, 850, 600),
+        async_mover_motor_C(1000, -200),
+        async_mover_motor_D(1000, 200))
     girar(-28)
     avanzar(145, 850, 600)
     correr_juntos(
-        lambda: mover_motor_C(100, 150),
-        lambda: mover_motor_D(100, -150))
+        async_mover_motor_C(100, 150),
+        async_mover_motor_D(100, -150))
     avanzar(20, 150, 100)
     girar_alrededor(0, -150, 18)
     retroceder(500, 1000, 900)  
@@ -100,8 +123,8 @@ def mision_2():
 
 def mision_3():
     correr_juntos(
-        lambda: mover_motor_C(500, 360),
-        lambda: mover_motor_D(500, 360))
+        async_mover_motor_C(500, 360),
+        async_mover_motor_D(500, 360))
 
 def mision_4():
     girar_alrededor(0, 300, -90)
