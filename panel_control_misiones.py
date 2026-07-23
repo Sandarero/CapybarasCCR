@@ -64,12 +64,12 @@ async def async_retroceder(distancia_mm, velocidad, aceleracion):
 
 async def async_mover_motor_C(velocidad, angulo):
     # Al pasar wait=False, Pybricks no bloquea y nos permite usar await
-    await motor_C.run_angle(velocidad, angulo, wait=False)
+    await motor_C.run_angle(velocidad, angulo)
     while not motor_C.done():
         await wait(10)
 
 async def async_mover_motor_D(velocidad, angulo):
-    await motor_D.run_angle(velocidad, angulo, wait=False)
+    await motor_D.run_angle(velocidad, angulo)
     while not motor_D.done():
         await wait(10)
 
@@ -100,7 +100,8 @@ def mision_1():
         async_mover_motor_D(100, -150))
     avanzar(20, 150, 100)
     girar_alrededor(0, -150, 18)
-    retroceder(500, 1000, 900)  
+    retroceder(500, 1000, 900)
+    pass  
 
 def mision_2():
     girar(90)
@@ -120,7 +121,6 @@ def mision_5():
 #   PANEL DE CONTROL
 #   - Lista de misiones en orden (agregar/sacar acá si cambia el número)
 #   - EJECUTAR: un True/False por misión, mismo orden que la lista
-
 mision_funciones = [mision_1, mision_2, mision_3, mision_4, mision_5]
 EJECUTAR = [True, False, False, False, False]
 NUM_MISIONES = len(mision_funciones)
