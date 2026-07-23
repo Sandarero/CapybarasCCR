@@ -73,6 +73,10 @@ async def async_mover_motor_D(velocidad, angulo):
     while not motor_D.done():
         await wait(10)
 
+async def con_delay(segundos, *corrutinas):
+    await wait(segundos * 1000)
+    await multitask(*corrutinas)
+
 async def _correr_juntos(*corrutinas):
     # Desempaquetamos directamente las corrutinas dentro de multitask
     await multitask(*corrutinas)
@@ -104,7 +108,11 @@ def mision_1():
     pass  
 
 def mision_2():
-    girar(90)
+    correr_juntos(
+        async_avanzar(500, 100, 900),
+        con_delay(3, async_mover_motor_C(1000, 150),
+        async_mover_motor_D(1000, -150)))
+pass
 
 def mision_3():
     correr_juntos(
@@ -122,7 +130,7 @@ def mision_5():
 #   - Lista de misiones en orden (agregar/sacar acá si cambia el número)
 #   - EJECUTAR: un True/False por misión, mismo orden que la lista
 mision_funciones = [mision_1, mision_2, mision_3, mision_4, mision_5]
-EJECUTAR = [True, False, False, False, False]
+EJECUTAR = [True, True, False, False, False]
 NUM_MISIONES = len(mision_funciones)
 
 #   SELECTOR DE MISIÓN INICIAL — botones del Hub
