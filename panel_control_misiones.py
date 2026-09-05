@@ -1,6 +1,6 @@
 from pybricks.hubs import PrimeHub
-from pybricks.pupdevices import Motor
-from pybricks.parameters import Port, Direction, Button
+from pybricks.pupdevices import Motor, ColorSensor
+from pybricks.parameters import Port, Direction, Button, Color
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait, multitask, run_task
 
@@ -15,7 +15,10 @@ right_motor = Motor(Port.B, Direction.CLOCKWISE)
 motor_C = Motor(Port.C)
 motor_D = Motor(Port.D)
 
-wheel_diameter = 62
+sensor_izq = Motor(Port.F)
+sensor_der = Motor(Port.E)
+
+wheel_diameter = 62 
 axle_track = 150
 robot = DriveBase(left_motor, right_motor, wheel_diameter, axle_track)
 robot.use_gyro(True)
@@ -86,32 +89,11 @@ def correr_juntos(*corrutinas):
 
 #   DEFINICIÓN DE MISIONES
 def mision_1():
-    correr_juntos(
-        async_avanzar(350, 850, 600),
-        async_mover_motor_C(1000, 200),
-        async_mover_motor_D(1000, -200))
-    girar(25, 300)
-    retroceder(150, 850, 600)
-    girar(45)
-    correr_juntos(
-        async_avanzar(300, 850, 600),
-        async_mover_motor_C(1000, -200),
-        async_mover_motor_D(1000, 200))
-    girar(-28)
-    avanzar(145, 850, 600)
-    correr_juntos(
-        async_mover_motor_C(100, 150),
-        async_mover_motor_D(100, -150))
-    avanzar(20, 150, 100)
-    girar_alrededor(0, -150, 18)
-    retroceder(500, 1000, 900)
+    mover_motor_C(1000, 90)
     pass  
 
 def mision_2():
-    correr_juntos(
-        async_avanzar(500, 100, 900),
-        con_delay(3, async_mover_motor_C(1000, 150),
-        async_mover_motor_D(1000, -150)))
+    mover_motor_D(1000, 90)
 pass
 
 def mision_3():
@@ -123,7 +105,7 @@ def mision_4():
     girar_alrededor(0, 300, -90)
 
 def mision_5():
-
+    print('terminado')
     pass
 
 #   PANEL DE CONTROL
@@ -136,19 +118,23 @@ NUM_MISIONES = len(mision_funciones)
 #   SELECTOR DE MISIÓN INICIAL — botones del Hub
 def elegir_y_correr_misiones():
     indice = 0
+    indice_ejecuciones = indice
     hub.display.number(indice + 1)
 
     while True:
         pressed = hub.buttons.pressed()
         if Button.RIGHT in pressed:
             indice = (indice + 1) % NUM_MISIONES
+            indice_ejecuciones = indice
             hub.display.number(indice + 1)
             while Button.RIGHT in hub.buttons.pressed():
                 wait(10)
 
         elif Button.LEFT in pressed:
             if EJECUTAR[indice]:
-                mision_funciones[indice]()
+                while not indice_ejecuciones > NUM_MISIONES -1:
+                    mision_funciones[indice_ejecuciones]()
+                    indice_ejecuciones = indice_ejecuciones + 1
             else:
                 # Misión desactivada: avisar con una X antes de volver al número
                 hub.display.char("X")
