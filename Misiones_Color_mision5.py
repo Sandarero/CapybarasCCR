@@ -18,8 +18,8 @@ motor_D = Motor(Port.D)
 motor_C.reset_angle(0)
 motor_D.reset_angle(0)
 
-sensor_izq = ColorSensor(Port.F)
-sensor_der = ColorSensor(Port.E)
+sensor_izq = ColorSensor(Port.E)
+sensor_der = ColorSensor(Port.F)
 
 wheel_diameter = 62 
 axle_track = 150
@@ -127,9 +127,34 @@ def mision_4():
     pass
 
 def mision_5():
-    mover_motor_D(-800, 4000)
+    correr_juntos(
+        async_mover_motor_D(-800, 850),
+        async_mover_motor_C(-400, 100),
+        async_avanzar(385, 700, 500)
+    )
+    girar(45)
+    avanzar(400, 700, 500)
+    girar(45)
+    avanzar(570, 700, 400)
+    girar(45)
+    retroceder(80, 200, 200)
+    girar(45)
+    retroceder(50, 100, 100)
+    mover_motor_C(1000, 230)
+    wait(1000)
+    avanzar(120, 200, 300)
+    correr_juntos(
+        async_mover_motor_D(-900, 4500),
+        con_delay(
+            3, async_retroceder(15,-50,50)
+        )
+    )
+
+    #async_mover_motor_D(-800, 4500)
+    #retroceder(20, 100, 100)
+    
     wait(100)
-    mover_motor_D(800, 3700)
+    mover_motor_D(800, 3200)
     pass
 
 def mision_detener():
@@ -191,13 +216,13 @@ def elegir_y_correr_misiones():
             if Button.LEFT in pressed or Button.RIGHT in pressed:
                 mision_1()
                 mision_detener()
-        elif color_izq == Color.GREEN and color_der == Color.RED:
+        elif color_izq == Color.BLUE and color_der == Color.RED:
             hub.display.number(2)
             
             if Button.LEFT in pressed or Button.RIGHT in pressed:
                 mision_2()
                 mision_detener()
-        elif color_izq == Color.RED and color_der == Color.GREEN:
+        elif color_izq == Color.GREEN and color_der == Color.RED:
             hub.display.number(3)
             
             if Button.LEFT in pressed or Button.RIGHT in pressed:
