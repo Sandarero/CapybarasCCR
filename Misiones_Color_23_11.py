@@ -73,7 +73,6 @@ async def async_avanzar(distancia_mm, velocidad, aceleracion):
 async def async_retroceder(distancia_mm, velocidad, aceleracion):
     await async_avanzar(-distancia_mm, velocidad, aceleracion)
 
-# El await ya espera a que termine; el while done() que tenías era código muerto
 async def async_mover_motor_C(velocidad, angulo):
     await motor_C.run_angle(velocidad, angulo)
 
@@ -137,8 +136,6 @@ def mision_5():
     mover_motor_C(1000, 230)
     wait(1000)
     avanzar(120, 200, 300)
-    # OJO: antes era async_retroceder(15, -50, 50): distancia Y velocidad negativas.
-    # Velocidad positiva; el signo ya lo da retroceder. Verificalo en la mesa.
     correr_juntos(
         async_mover_motor_D(-900, 4500),
         con_delay(3, async_retroceder(15, 50, 50))
@@ -154,8 +151,6 @@ def detener_todo():
 
 #   SELECTOR POR COLORES
 def color_estable(sensor, lecturas=5):
-    """Lee varias veces seguidas. Si no coinciden, devuelve Color.NONE.
-    No bloquea: el menú sigue vivo aunque no haya tarjeta."""
     c = sensor.color()
     for _ in range(lecturas - 1):
         wait(5)
